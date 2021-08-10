@@ -11,13 +11,16 @@ private:
 
     const int gravity = 1;
     float jumpVelocity;
-    Vector2 rectSize;
-    int rectPosY;
     float velocity;
     bool isGrounded;
 
+    Texture2D scarfy;
+    Rectangle scarfyRect;
+    Vector2 scarfyPos;
+    
     void initwindow();
     void initVariables();
+    void initSprites();
 public:
     Game();
     ~Game();

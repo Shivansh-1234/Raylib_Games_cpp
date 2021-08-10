@@ -2,12 +2,14 @@
 
 Game::Game()
 {
-    this->initVariables();
     this->initwindow();
+    this->initVariables();
+    this->initSprites();
 }
 
 Game::~Game()
 {
+    UnloadTexture(this->scarfy);
 }
 
 void Game::initwindow()
@@ -18,9 +20,6 @@ void Game::initwindow()
 
 void Game::initVariables()
 {
-    this->rectSize.x = 50;
-    this->rectSize.y = 80;
-    this->rectPosY = windowHeight - rectSize.y;
     this->velocity = 0.0f;
     this->jumpVelocity = -22.0f;
 
@@ -45,7 +44,7 @@ void Game::render()
 
 void Game::playerMovement()
 {
-    if (rectPosY >= windowHeight - rectSize.y)
+    if (scarfyPos.y >= windowHeight - scarfyRect.height)
     {
         velocity = 0.0f;
         isGrounded = true;
@@ -62,12 +61,28 @@ void Game::playerMovement()
         isGrounded = false;
     }
 
-    rectPosY += velocity;
+    scarfyPos.y += velocity;
 }
 
 void Game::playerRender()
 {
-    DrawRectangle(windowWidth / 2, rectPosY, rectSize.x, rectSize.y, GREEN);
+    DrawTextureRec(scarfy, scarfyRect , scarfyPos , WHITE);
+}
+
+void Game::initSprites()
+{
+    
+    this->scarfy = LoadTexture("textures/scarfy.png");
+    //Rec Properties
+    this->scarfyRect.width = this->scarfy.width/6;
+    this->scarfyRect.height = this->scarfy.height;
+    this->scarfyRect.x = 0;
+    this->scarfyRect.y = 0;
+
+    //Vector Properties
+    this->scarfyPos.x = this->windowWidth/2 - this->scarfyRect.width/2;
+    this->scarfyPos.y = this->windowHeight - this->scarfyRect.height;
+    
 }
 
 const bool Game::running() const
