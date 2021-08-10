@@ -1,15 +1,15 @@
-#include "raylib.h"
+#include "Game.h"
+
+Game game;
 
 int main()
 {
-    InitWindow(1920 , 1080, "jiujiji");
-    SetTargetFPS(144);
 
-    while (!WindowShouldClose())
+    while (game.running())
     {
-        BeginDrawing();
-        ClearBackground(RED);
-        EndDrawing();
+       game.update();
+       game.render();
     }
+    game.close();
     
 }
