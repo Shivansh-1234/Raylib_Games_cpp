@@ -10,6 +10,7 @@ Game::Game()
 Game::~Game()
 {
     UnloadTexture(this->scarfy);
+    UnloadTexture(this->nebula);
 }
 
 void Game::initwindow()
@@ -22,9 +23,51 @@ void Game::initVariables()
 {
     this->velocity = 0.0f;
     this->jumpVelocity = -600.0f;
-    this->frame = 0;
+    this->nebVelocity = -200.0f;
 
     this->isGrounded = true;
+}
+
+void Game::initSprites()
+{   
+    //SCARFY
+    this->scarfy = LoadTexture("textures/scarfy.png");
+    this->nebula = LoadTexture("textures/12_nebula_spritesheet.png");
+    this->scarfyData.rec.width = scarfy.width/6;
+    this->scarfyData.rec.height = scarfy.height;
+    this->scarfyData.rec.x = 0;
+    this->scarfyData.rec.y = 0;
+
+    this->scarfyData.pos.x = windowWidth/2 - scarfyData.rec.width/2;
+    this->scarfyData.pos.y = windowHeight - scarfyData.rec.height;
+    this->scarfyData.frame = 0;
+    this->scarfyData.updatingTime = 1.0f/12.0f;
+    this->scarfyData.runningTime = 0.0f;
+
+    // NEBULA
+    
+    this->nebData.rec.width = nebula.width/8;
+    this->nebData.rec.height = nebula.height/8;
+    this->nebData.rec.x = 0;
+    this->nebData.rec.y = 0;
+
+    this->nebData.pos.x = windowWidth;
+    this->nebData.pos.y = windowHeight - nebula.height/8;
+    this->nebData.frame = 0;
+    this->nebData.updatingTime = 1.0f/12.0f;
+    this->nebData.runningTime = 0.0f;
+
+    //NEBULA 2
+    this->neb2Data.rec.width = nebula.width/8;
+    this->neb2Data.rec.height = nebula.height/8;
+    this->neb2Data.rec.x = 0;
+    this->neb2Data.rec.y = 0;
+
+    this->neb2Data.pos.x = windowWidth + 300;
+    this->neb2Data.pos.y = windowHeight - nebula.height/8;
+    this->neb2Data.frame = 0;
+    this->neb2Data.updatingTime = 1.0f/16.0f;
+    this->neb2Data.runningTime = 0.0f;
 }
 
 void Game::update()
@@ -47,7 +90,7 @@ void Game::render()
 
 void Game::playerMovement()
 {
-    if (scarfyPos.y >= windowHeight - scarfyRect.height)
+    if (scarfyData.pos.y >= windowHeight - scarfyData.rec.height)
     {
         velocity = 0.0f;
         isGrounded = true;
@@ -64,43 +107,62 @@ void Game::playerMovement()
         isGrounded = false;
     }
 
-    scarfyPos.y += velocity * setdeltaTime();
+    this->nebData.pos.x += nebVelocity * setdeltaTime();
+    this->neb2Data.pos.x += nebVelocity * setdeltaTime();
+    this->scarfyData.pos.y += velocity * setdeltaTime();
 }
 
 void Game::playerRender()
 {
-    DrawTextureRec(scarfy, scarfyRect, scarfyPos, WHITE);
-}
-
-void Game::initSprites()
-{
-
-    this->scarfy = LoadTexture("textures/scarfy.png");
-    //Rec Properties
-    this->scarfyRect.width = this->scarfy.width / 6;
-    this->scarfyRect.height = this->scarfy.height;
-    this->scarfyRect.x = 0;
-    this->scarfyRect.y = 0;
-
-    //Vector Properties
-    this->scarfyPos.x = this->windowWidth / 2 - this->scarfyRect.width / 2;
-    this->scarfyPos.y = this->windowHeight - this->scarfyRect.height;
+    DrawTextureRec(this->nebula, this->nebData.rec, this->nebData.pos, WHITE);
+    DrawTextureRec(this->nebula, this->neb2Data.rec, this->neb2Data.pos, RED);
+    DrawTextureRec(this->scarfy, this->scarfyData.rec, this->scarfyData.pos, WHITE);
 }
 
 void Game::animatePlayer()
 {
-    this->runningTime += this->setdeltaTime();
+    //SCARFY
+    this->scarfyData.runningTime += this->setdeltaTime();
 
-    if (runningTime >= updateTime)
+    if (this->scarfyData.runningTime >= this->scarfyData.updatingTime && isGrounded)
     {
-        runningTime = 0.0f;
+        this->scarfyData.runningTime = 0.0f;
 
-        this->scarfyRect.x = frame * scarfyRect.width;
-        frame++;
+        this->scarfyData.rec.x = this->scarfyData.frame * this->scarfyData.rec.width;
+        this->scarfyData.frame++;
 
-        if (frame > 5)
-            frame = 0;
+        if (this->scarfyData.frame > 5)
+            this->scarfyData.frame = 0;
     }
+
+    //NEBULA
+    this->nebData.runningTime += this->setdeltaTime();
+
+    if(this->nebData.runningTime >= this->nebData.updatingTime)
+    {
+        this->nebData.runningTime = 0.0f;
+
+        this->nebData.rec.x = this->nebData.frame * this->nebData.rec.width;
+        this->nebData.frame++;
+
+        if(this->nebData.frame> 7)
+            this->nebData.frame = 0;    
+    }
+
+    //NEB2
+    this->neb2Data.runningTime += this->setdeltaTime();
+
+    if(this->neb2Data.runningTime >= this->neb2Data.updatingTime)
+    {
+        this->neb2Data.runningTime = 0.0f;
+
+        this->neb2Data.rec.x = this->neb2Data.frame * this->neb2Data.rec.width;
+        this->neb2Data.frame++;
+
+        if(this->neb2Data.frame> 7)
+            this->neb2Data.frame = 0;    
+    }
+
 }
 
 void Game::getdeltaTime()
